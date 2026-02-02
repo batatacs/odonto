@@ -3,7 +3,7 @@ import {
   Menu, X, ArrowRight, Instagram, Facebook, Linkedin, MapPin, Play, Quote, Star,
   Send, CheckCircle, Smartphone, Code, ShieldCheck, HeartPulse, Activity,
   Wifi, Phone, Car, Snowflake, Accessibility, AlertCircle,
-  Coffee, Camera, Monitor, Sparkles
+  Coffee, Camera, Monitor, Sparkles, Volume2, VolumeX
 } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 
@@ -423,18 +423,30 @@ const ServiceModal = ({ service, onClose }) => {
 };
 
 const BioModal = ({ isOpen, onClose }) => {
+  // Hooks para controlar o vídeo e o som
+  const videoRef = useRef(null);
+  const [isMuted, setIsMuted] = useState(true);
+
   if (!isOpen) return null;
+
+  // Função para alternar o som ao clicar
+  const toggleSound = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
 
   return (
     <AnimatePresence>
-      <motion.div
+      <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-12 bg-black/95 backdrop-blur-xl"
         onClick={onClose}
       >
-        <motion.div
+        <motion.div 
           initial={{ y: 50, opacity: 0, scale: 0.95 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 50, opacity: 0, scale: 0.95 }}
@@ -442,42 +454,51 @@ const BioModal = ({ isOpen, onClose }) => {
           className="bg-[#0f0f0f] w-full max-w-6xl h-[85vh] rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col md:flex-row relative cursor-auto"
           onClick={(e) => e.stopPropagation()}
         >
-          <button
+          <button 
             onClick={onClose}
             className="interactive absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-amber-500 rounded-full text-white transition-all duration-300 border border-white/10 hover:rotate-90"
           >
             <X size={20} />
           </button>
 
-          <div className="w-full md:w-5/12 h-56 md:h-full relative overflow-hidden bg-black shrink-0">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover opacity-80"
-            >
-              <source src={ASSETS.modalVideo} type="video/mp4" />
-            </video>
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90"></div>
-
-            <div className="absolute bottom-8 left-8 right-8 z-20">
-              <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center mb-4 text-black animate-pulse">
-                <Play size={18} fill="currentColor" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500 mb-2 block">Assista</span>
-              <p className="text-white text-2xl font-serif leading-tight">Bastidores de uma transformação.</p>
-            </div>
+          {/* Área do Vídeo (Clicável para som) */}
+          <div 
+            className="w-full md:w-5/12 h-56 md:h-full relative overflow-hidden bg-black shrink-0 cursor-pointer group"
+            onClick={toggleSound}
+          >
+             <video 
+               ref={videoRef}
+               autoPlay 
+               loop 
+               muted // Começa mudo para permitir autoplay
+               playsInline
+               className="w-full h-full object-cover opacity-80"
+             >
+               {/* Certifique-se que ASSETS.modalVideo está apontando para um arquivo .mp4 válido */}
+               <source src={ASSETS.modalVideo} type="video/mp4" />
+             </video>
+             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90 pointer-events-none"></div>
+             
+             <div className="absolute bottom-8 left-8 right-8 z-20 pointer-events-none">
+               <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center mb-4 text-black animate-pulse">
+                  {/* Ícone muda dependendo se está mudo ou não */}
+                  {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+               </div>
+               <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500 mb-2 block">
+                 {isMuted ? "Toque para Ouvir" : "Ouvindo"}
+               </span>
+               <p className="text-white text-2xl font-serif leading-tight">Bastidores de uma transformação.</p>
+             </div>
           </div>
 
           <div className="w-full md:w-7/12 p-6 md:p-16 overflow-y-auto custom-scrollbar">
             <span className="text-amber-500 text-xs font-bold uppercase tracking-[0.3em] mb-4 block">A Especialista</span>
-            {/* Header com Nome sem ícone no Modal */}
+            {/* Header com Nome e Subtítulo */}
             <div className="mb-6">
               <h2 className="text-3xl md:text-5xl font-serif text-white leading-none font-['Cinzel'] font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200">DRA. CAROLINA MARELLI</h2>
               <span className="text-stone-400 uppercase font-light text-[10px] tracking-[0.4em] block mt-1">ODONTOLOGIA ESPECIALIZADA</span>
             </div>
-
+            
             <div className="prose prose-invert prose-lg text-stone-400 font-light text-sm md:text-base">
               <p className="mb-6">
                 <span className="text-white font-medium">"A beleza é uma harmonia matemática."</span> Desde pequena, a arte de cuidar sempre esteve presente em minha vida. Minha abordagem na odontologia não é apenas técnica; é sobre devolver a autoestima e a confiança que muitas vezes se perderam.
@@ -486,16 +507,16 @@ const BioModal = ({ isOpen, onClose }) => {
                 Com especializações internacionais e uma busca incessante pela perfeição natural, fundei meu atelier para oferecer uma experiência que vai muito além da cadeira do dentista. Aqui, cada sorriso é uma obra de arte única.
               </p>
             </div>
-
+            
             <div className="grid grid-cols-2 gap-4 md:gap-8 border-t border-white/10 pt-8 mt-4">
-              <div className="interactive group cursor-pointer hover:bg-white/5 p-4 rounded-xl transition-colors -ml-4">
-                <span className="block text-2xl md:text-3xl font-serif text-white mb-1 group-hover:text-amber-500 transition-colors">Harvard</span>
-                <span className="text-[9px] md:text-[10px] text-stone-500 uppercase tracking-widest">Medical School (Ext)</span>
-              </div>
-              <div className="interactive group cursor-pointer hover:bg-white/5 p-4 rounded-xl transition-colors -ml-4">
-                <span className="block text-2xl md:text-3xl font-serif text-white mb-1 group-hover:text-amber-500 transition-colors">SBOE</span>
-                <span className="text-[9px] md:text-[10px] text-stone-500 uppercase tracking-widest">Membro Titular</span>
-              </div>
+               <div className="interactive group cursor-pointer hover:bg-white/5 p-4 rounded-xl transition-colors -ml-4">
+                 <span className="block text-2xl md:text-3xl font-serif text-white mb-1 group-hover:text-amber-500 transition-colors">Harvard</span>
+                 <span className="text-[9px] md:text-[10px] text-stone-500 uppercase tracking-widest">Medical School (Ext)</span>
+               </div>
+               <div className="interactive group cursor-pointer hover:bg-white/5 p-4 rounded-xl transition-colors -ml-4">
+                 <span className="block text-2xl md:text-3xl font-serif text-white mb-1 group-hover:text-amber-500 transition-colors">SBOE</span>
+                 <span className="text-[9px] md:text-[10px] text-stone-500 uppercase tracking-widest">Membro Titular</span>
+               </div>
             </div>
 
             <button onClick={onClose} className="interactive mt-10 text-xs uppercase tracking-widest text-white border-b border-amber-500 pb-1 hover:text-amber-500 transition-colors">
