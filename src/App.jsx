@@ -529,6 +529,51 @@ const BioModal = ({ isOpen, onClose }) => {
   );
 };
 
+// --- NOVO COMPONENTE: PLAYER INTELIGENTE (Copie e cole ANTES do 'const App') ---
+const SmartVideoPlayer = ({ src, poster }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef(null);
+
+  const handlePlay = () => {
+    setIsPlaying(true);
+    if (videoRef.current) {
+      videoRef.current.muted = false; // Liga o som
+      videoRef.current.volume = 1.0;
+      videoRef.current.play();
+    }
+  };
+
+  // Se o vídeo pausar ou acabar, mostra o botão de novo
+  const handlePauseOrEnd = () => {
+    setIsPlaying(false);
+  };
+
+  return (
+    <div className="relative aspect-video max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer bg-black" onClick={!isPlaying ? handlePlay : undefined}>
+      <video
+        ref={videoRef}
+        controls={isPlaying} // Controles aparecem só quando toca
+        poster={poster}
+        className="w-full h-full object-cover"
+        playsInline
+        onPause={handlePauseOrEnd}
+        onEnded={handlePauseOrEnd}
+      >
+        <source src={src} type="video/mp4" />
+      </video>
+
+      {/* O botão Play só aparece se NÃO estiver tocando (!isPlaying) */}
+      {!isPlaying && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition-all z-20">
+          <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-lg group-hover:scale-110 transition-transform">
+            <Play size={32} fill="currentColor" className="text-white ml-1" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // --- 6. COMPONENTES PRINCIPAIS (APP) ---
 
 const App = () => {
@@ -644,22 +689,21 @@ const App = () => {
   if (loading) {
     return (
       <div className="fixed inset-0 z-[99999] bg-[#050505] flex flex-col items-center justify-center overflow-hidden">
-        {/* Vídeo Preloader (Tela Cheia) */}
         <video
           autoPlay
           muted
           playsInline
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
         >
           <source src={ASSETS.preloaderVideo} type="video/mp4" />
         </video>
 
-        {/* Barra de Progresso Dourada Opcional */}
+        {/* Barra de Progresso Dourada */}
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: "100%" }}
           transition={{ duration: 4, ease: "linear" }}
-          className="absolute bottom-0 left-0 h-1 bg-amber-500"
+          className="absolute bottom-0 left-0 h-1 bg-amber-500 z-20"
         />
       </div>
     );
@@ -1046,27 +1090,15 @@ const App = () => {
         </div>
       </section>
 
-      {/* --- NOVA SEÇÃO: HISTÓRIAS QUE INSPIRAM (VÍDEO TRANSFORMAÇÃO) --- */}
+      {/* --- NOVA SEÇÃO: HISTÓRIAS QUE INSPIRAM --- */}
       <section className="py-24 md:py-32 bg-[#0a0a0a] relative overflow-hidden">
         <div className="container mx-auto px-6 text-center relative z-10">
           <span className="text-amber-500 text-xs font-bold uppercase tracking-[0.3em] mb-4 block">Inspiração</span>
           <h2 className="text-3xl md:text-5xl font-serif text-white mb-12">Histórias que transformam vidas</h2>
 
-          <div className="relative aspect-video max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer">
-            <video
-              controls
-              poster={ASSETS.heroPoster}
-              className="w-full h-full object-cover"
-            >
-              <source src={ASSETS.transformationVideo} type="video/mp4" />
-            </video>
+          {/* AQUI ESTÁ A MÁGICA: Substituímos o código antigo por este componente */}
+          <SmartVideoPlayer src={ASSETS.transformationVideo} poster={ASSETS.heroPoster} />
 
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:bg-black/20 transition-all">
-              <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-lg group-hover:scale-110 transition-transform">
-                <Play size={32} fill="currentColor" className="text-white ml-1" />
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
