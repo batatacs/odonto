@@ -17,6 +17,7 @@ import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'fra
 
 // --- VÍDEOS ---
 import localPreloaderVideo from './assets/imagens/preloader.mp4';      // Seu vídeo do logo dourado
+import localPreloaderVideoMobile from './assets/imagens/preloader.mp4';      // Seu vídeo do logo dourado
 // import localHeroVideo from './assets/video-hero.mp4';                // Vídeo de fundo da mulher sorrindo
 import localTransformVideo from './assets/imagens/odonto.mp4';  // Vídeo "Histórias que Inspiram"
 import localModalVideo from './assets/imagens/odonto.mp4';          // Vídeo da Dra. atendendo (para o Modal)
@@ -106,6 +107,7 @@ const MARKETING_CONFIG = {
 const ASSETS = {
   // 1. VÍDEO DE CARREGAMENTO (Seu Logo animado)
   preloaderVideo: localPreloaderVideo,
+  preloaderVideoMobile: localPreloaderVideoMobile,
   // preloaderVideo: "https://assets.mixkit.co/videos/preview/mixkit-gold-particles-loop-5441-large.mp4",
 
   // 2. VÍDEO DO TOPO (Hero)
@@ -689,13 +691,30 @@ const App = () => {
   if (loading) {
     return (
       <div className="fixed inset-0 z-[99999] bg-[#050505] flex flex-col items-center justify-center overflow-hidden">
+        {/* Vídeo Preloader (Tela Cheia Ajustada) */}
+        {/* 1. VERSÃO PC (DESKTOP) - Horizontal 
+            Aparece apenas em telas médias para cima (md:block)
+         */}
         <video
           autoPlay
           muted
           playsInline
-          className="w-full h-full object-contain"
+          className="hidden md:block w-full h-full object-cover"
         >
           <source src={ASSETS.preloaderVideo} type="video/mp4" />
+        </video>
+
+        {/* 2. VERSÃO CELULAR (MOBILE) - Vertical 
+            Aparece apenas em telas pequenas (block md:hidden)
+         */}
+        <video
+          autoPlay
+          muted
+          playsInline
+          // Tenta usar o vídeo mobile específico se existir, senão usa o padrão com object-contain para não cortar
+          className="block md:hidden w-full h-full object-contain"
+        >
+          <source src={ASSETS.preloaderVideoMobile || ASSETS.preloaderVideo} type="video/mp4" />
         </video>
 
         {/* Barra de Progresso Dourada */}
